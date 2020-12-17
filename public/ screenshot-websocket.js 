@@ -1,0 +1,26 @@
+// Requires ws and screenshot-desktop
+
+const WebSocket = require('ws');
+const screenshot = require('screenshot-desktop')
+
+const wss = new WebSocket.Server({ port: 8889 });
+
+wss.on('connection', function connection(ws) {
+  ws.on('message', function incoming(message) {
+    console.log('received: %s', message);
+  });
+
+  ws.on('close', ()=>{
+    clearInterval(interval);
+    console.log("disconnect")
+  })
+  console.log("connect")
+
+  const interval = setInterval(()=>{
+    screenshot({
+        format: 'jpg'
+    }).then(img => {
+      ws.send(img);
+    })
+  }, 500)
+});
